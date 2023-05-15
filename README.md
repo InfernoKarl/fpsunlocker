@@ -1,7 +1,7 @@
 # fpsunlocker
 ### Fun project to convert an existing GO FPS unlocker to C#
 
-The code is pretty jumbled, since I just took [aidennn's FPS unlocker](https://v3rmillion.net/member.php?action=profile&uid=2554539) and turned it into C# because I don't like GO :(
+The code is pretty jumbled, since I just took [aidennn's](https://v3rmillion.net/member.php?action=profile&uid=2554539) FPS unlocker and turned it into C# because I don't like GO :(
 
 Can build from source: [Source](/source.cs)  
 And can get the pre-built exe from Releases ([Quicklink](https://github.com/InfernoKarl/fpsunlocker/releases/download/test/RBXFPSUNLOCKER.rar))
