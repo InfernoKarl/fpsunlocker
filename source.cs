@@ -16,52 +16,60 @@ class Program
             return;
         }
 
-        HttpClient client = new HttpClient();
-        HttpResponseMessage response = await client.GetAsync("https://raw.githubusercontent.com/lxyobaba/version/main/robloxversion");
-
-        if (!response.IsSuccessStatusCode)
+        var version = await FetchVersion();
+        if (version == null)
         {
-            Console.WriteLine("Version Error. Maybe your roblox is outdated?");
             return;
         }
 
-        var body = await response.Content.ReadAsStringAsync();
+        var versionPath = Path.Combine(localAppData, "Roblox", "Versions", version);
+        Console.WriteLine("Versions folder path: {0}", versionPath);
 
-        Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(body);
+        var clientSettingsPath = CreateDirectoryIfNotExist(Path.Combine(versionPath, "ClientSettings"));
 
-        if (!data.TryGetValue("ver", out object verObj) || !(verObj is string ver))
-        {
-            Console.WriteLine("Invalid Version");
-            return;
-        }
-
-        var robloxPath = Path.Combine(localAppData, "Roblox");
-        var versionsPath = Path.Combine(robloxPath, "Versions");
-        var versionPath = Path.Combine(versionsPath, ver);
-        Console.WriteLine("Versions folder path:", versionPath);
-
-        var clientSettingsPath = Path.Combine(versionPath, "ClientSettings");
-        if (!Directory.Exists(clientSettingsPath))
-        {
-            Directory.CreateDirectory(clientSettingsPath);
-        }
-
-        Console.Write("Enter the maximum FPS value: ");
-        if (!int.TryParse(Console.ReadLine(), out int maxFPS))
+        if (!int.TryParse(GetUserInput("Enter the maximum FPS value: "), out int maxFPS))
         {
             Console.WriteLine("Invalid input");
             return;
         }
 
-        var settings = new Dictionary<string, object>
-        {
-            { "DFIntTaskSchedulerTargetFps", maxFPS }
-        };
-
+        var settings = new Dictionary<string, object> { { "DFIntTaskSchedulerTargetFps", maxFPS } };
         var settingsJSON = JsonConvert.SerializeObject(settings);
-        var settingsFilePath = Path.Combine(clientSettingsPath, "ClientAppSettings.json");
-        await File.WriteAllTextAsync(settingsFilePath, settingsJSON);
+        await File.WriteAllTextAsync(Path.Combine(clientSettingsPath, "ClientAppSettings.json"), settingsJSON);
 
-        Console.WriteLine("discord.gg/infernoscripts | Max FPS has been set: ", maxFPS);
+        Console.WriteLine("discord.gg/infernoscripts | Max FPS has been set: {0}", maxFPS);
+    }
+
+    static async Task<string> FetchVersion()
+    {
+        using HttpClient client = new();
+        var response = await client.GetAsync("https://raw.githubusercontent.com/lxyobaba/version/main/robloxversion");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Version Error. Maybe your roblox is outdated?");
+            return null;
+        }
+
+        var body = await response.Content.ReadAsStringAsync();
+        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(body);
+
+        return data.TryGetValue("ver", out object verObj) && verObj is string ver ? ver : null;
+    }
+
+    static string CreateDirectoryIfNotExist(string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        return path;
+    }
+
+    static string GetUserInput(string prompt)
+    {
+        Console.Write(prompt);
+        return Console.ReadLine();
     }
 }
