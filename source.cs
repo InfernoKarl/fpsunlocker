@@ -13,6 +13,7 @@ class Program
         if (string.IsNullOrEmpty(localAppData))
         {
             Console.WriteLine("APPDATA ENV Variable Missing. Huh, that's funky.");
+            await Task.Delay(TimeSpan.FromSeconds(3));
             return;
         }
 
@@ -38,6 +39,8 @@ class Program
         await File.WriteAllTextAsync(Path.Combine(clientSettingsPath, "ClientAppSettings.json"), settingsJSON);
 
         Console.WriteLine("discord.gg/infernoscripts | Max FPS has been set: {0}", maxFPS);
+
+        await Task.Delay(TimeSpan.FromSeconds(3));
     }
 
     static async Task<string> FetchVersion()
@@ -48,6 +51,7 @@ class Program
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine("Version Error. Maybe your roblox is outdated?");
+            await Task.Delay(TimeSpan.FromSeconds(3));
             return null;
         }
 
